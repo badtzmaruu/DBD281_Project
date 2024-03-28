@@ -1,10 +1,10 @@
 -- Create the Dentist database.
 --Execute first and then upload tables.
 CREATE DATABASE Dentist;
-
+GO
 -- Switch to Dentist database
 USE Dentist;
-
+GO
 -- Create Employee_Types table
 CREATE TABLE Employee_Types(
     Employee_TypeID INT NOT NULL,
@@ -133,6 +133,7 @@ CREATE TABLE Payment(
     FOREIGN KEY (Treatment_ID) REFERENCES Treatments (Treatment_ID),
     FOREIGN KEY (Employee_ID) REFERENCES Employees (Employee_ID)
 );
+GO
 --------------------------------------------------------------------------------------------------------------------------
 --Add data into tables:
 -- Insert records into Employee_Types table
@@ -355,6 +356,7 @@ VALUES
 (13, 13, 13, 13, 'Credit Card', '2024-03-27', 13, 700.00),
 (14, 14, 14, 14, 'Cash', '2024-03-27', 14, 120.00),
 (15, 15, 15, 15, 'Credit Card', '2024-03-27', 15, 300.00);
+GO
 ----------------------------------------------------------------------------------------------------------------------------
 -- Indexes
 CREATE INDEX idx_Patients_Phone ON Patients (Phone);
