@@ -189,5 +189,91 @@ GO
 			END;
 		END;
 
---logins and other objects
+
+--LOGINS & OTHER OBJECTS
+-- logins
+CREATE LOGIN SampleLogin WITH PASSWORD = 'DentistStrongPassword';
+CREATE USER SampleUser FOR LOGIN SampleLogin;
+CREATE ROLE DataEntryRole;
+CREATE ROLE DoctorRole;
+CREATE ROLE AdministratorRole;
+
+--assigning the permissions to the roles
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Appointments TO DataEntryRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Patients TO DataEntryRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Appointments TO DoctorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Patient_Treatments TO DoctorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Appointments TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Patients TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Patient_Treatments TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Payment TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Treatments TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Rooms TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Room_Bookings TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Employee_Types TO AdministratorRole;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Employees TO AdministratorRole;
+
+--other objects (indexes,views, and constraints)
+--index
+CREATE INDEX IX_Appointment_Date ON Appointments (Appointment_Date);
+CREATE INDEX IX_Patient_LastName ON Patients (Patient_LastName);
+
+--views
+CREATE VIEW AppointmentDetails AS
+SELECT A.Appointment_ID, A.Appointment_Date, A.Appointment_time,
+       P.Patient_FirstName, P.Patient_LastName, P.City,
+       T.Treatment, Py.Payment_Method
+FROM Appointments A
+INNER JOIN Patients P ON A.Patient_ID = P.Patient_ID
+INNER JOIN Patient_Treatments PT ON A.PatientTreatment_ID = PT.PatientTreatment_ID
+INNER JOIN Treatments T ON PT.Treatment_ID = T.Treatment_ID
+INNER JOIN Payment Py ON PT.PatientTreatment_ID = Py.PatientTreatment_ID;
+
+/*if the object exists, rename and drop:
+CREATE VIEW NewAppointmentDetails AS
+SELECT A.Appointment_ID, A.Appointment_Date, A.Appointment_time,
+       P.Patient_FirstName, P.Patient_LastName, P.City,
+       T.Treatment, Py.Payment_Method
+FROM Appointments A
+INNER JOIN Patients P ON A.Patient_ID = P.Patient_ID
+INNER JOIN Patient_Treatments PT ON A.PatientTreatment_ID = PT.PatientTreatment_ID
+INNER JOIN Treatments T ON PT.Treatment_ID = T.Treatment_ID
+INNER JOIN Payment Py ON PT.PatientTreatment_ID = Py.PatientTreatment_ID;
+
+DROP VIEW AppointmentDetails;
+
+and thern continute to run the code
+*/
+
+CREATE VIEW RoomUtilization AS
+SELECT R.Room_ID, R.RoomName, COUNT(RB.RoomBooking_ID) AS Bookings
+FROM Rooms R
+LEFT JOIN Room_Bookings RB ON R.Room_ID = RB.Room_ID
+GROUP BY R.Room_ID, R.RoomName;
+
+/*if the object exists, rename and drop:
+CREATE VIEW NewRoomUtilization AS
+SELECT R.Room_ID, R.RoomName, COUNT(RB.RoomBooking_ID) AS Bookings
+FROM Rooms R
+LEFT JOIN Room_Bookings RB ON R.Room_ID = RB.Room_ID
+GROUP BY R.Room_ID, R.RoomName;
+
+DROP VIEW RoomUtilization;
+
+and thern continute to run the code
+*/
+
+--constraints
+ALTER TABLE Patients
+ADD Age INT;
+
+ALTER TABLE Patients
+ADD CONSTRAINT CHK_Age CHECK (Age >= 0 AND Age < 120);
+
+ALTER TABLE Appointments
+ADD CONSTRAINT FK_Appointments_Patients FOREIGN KEY (Patient_ID) REFERENCES Patients(Patient_ID);
+
+
+
+
 	
