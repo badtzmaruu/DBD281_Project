@@ -56,17 +56,18 @@ GO
 		WHERE IsAvailable = 'Yes';
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --Views
+	GO
 	--View for patient appointments and treatments with employee details:
 		CREATE VIEW PatientAppointmentDetails AS
 		SELECT a.Appointment_ID, a.Appointment_Date, a.Appointment_time,
-			   p.Patient_FirstName, p.Patient_LastName, p.City,
-			   t.Treatment, py.Payment_Method
+		       p.Patient_FirstName, p.Patient_LastName, p.City,
+		       t.Treatment, py.Payment_Method
 		FROM Appointments a
 		INNER JOIN Patients p ON a.Patient_ID = p.Patient_ID
 		INNER JOIN Patient_Treatments pt ON a.PatientTreatment_ID = pt.PatientTreatment_ID
 		INNER JOIN Treatments t ON pt.Treatment_ID = t.Treatment_ID
 		INNER JOIN Payment py ON pt.PatientTreatment_ID = py.PatientTreatment_ID;
-		GO
+	GO
 	-- View to look at employee performance like how many patients, revenue and avg duration per patient:
 		CREATE VIEW EmployeePerformance 
 		AS
@@ -116,7 +117,7 @@ GO
 		    WHERE Patient_ID = @PatientID;
 		END;
 		-- EXECUTE GetPatientByID @PatientID = 1;
-
+	GO
 	-- Stored procedure to update patient information
 		CREATE PROCEDURE UpdatePatientInfo
 			@PatientID INT,
@@ -128,9 +129,9 @@ GO
 			WHERE Patient_ID = @PatientID;
 		END;
 		-- Execute UpdatePatientInfo stored procedure
-		EXEC UpdatePatientInfo @PatientID = 123, @NewCity = 'New York';
+		EXECUTE UpdatePatientInfo @PatientID = 123, @NewCity = 'New York';
 		-- Replace 123 with the actual Patient_ID and 'New York' with the new city value
-
+	GO
 	-- Stored procedure to calculate total revenue for a specific date range
 		CREATE PROCEDURE CalculateRevenue
 			@StartDate DATE,
@@ -145,8 +146,8 @@ GO
 		-- Execute CalculateRevenue stored procedure
 			DECLARE @StartDate DATE = '2024-01-01';
 			DECLARE @EndDate DATE = '2024-12-31';
-			EXEC CalculateRevenue @StartDate, @EndDate;
-
+			EXECUTE CalculateRevenue @StartDate, @EndDate;
+	GO
 	-- Stored procedure to delete a patient and all related records
 		CREATE PROCEDURE DeletePatientCascade
 			@PatientID INT
@@ -157,10 +158,11 @@ GO
 		END;
 
 		-- Execute DeletePatientCascade stored procedure
-		EXEC DeletePatientCascade @PatientID = 123;
+		EXECUTE DeletePatientCascade @PatientID = 123;
 		-- Replace 123 with the actual Patient_ID to be deleted
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
---triggers
+--Triggers
+	GO
 	-- Trigger to log patient deletions
 		CREATE TRIGGER LogPatientDeletions
 		ON Patients
@@ -173,7 +175,7 @@ GO
     
 			DELETE FROM Patients WHERE Patient_ID IN (SELECT Patient_ID FROM deleted);
 		END;
-
+	GO
 	-- Trigger to enforce unique emails for patients
 		CREATE TRIGGER EnforceUniqueEmail
 		ON Patients
