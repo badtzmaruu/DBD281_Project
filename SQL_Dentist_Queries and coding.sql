@@ -54,6 +54,30 @@ GO
 		SELECT Employee_FirstName, Employee_LastName, Employee_TypeID
 		FROM Employees
 		WHERE IsAvailable = 'Yes';
+
+	--Total Revenue by treratement type:
+	SELECT T.Treatment, SUM(P.Total) AS TotalRevenue
+	FROM Treatments T
+	INNER JOIN Patient_Treatments PT ON T.Treatment_ID = PT.Treatment_ID
+	INNER JOIN Payment P ON PT.PatientTreatment_ID = P.PatientTreatment_ID
+	GROUP BY T.Treatment;
+
+	-- Patients with overdue appointments
+	SELECT P.Patient_ID, P.Patient_FirstName, P.Patient_LastName
+	FROM Patients P
+	INNER JOIN Appointments A ON P.Patient_ID = A.Patient_ID
+	WHERE A.Appointment_Date < GETDATE();
+
+	-- total revenue by employee type
+	SELECT et.TypeName, SUM(p.Total) AS TotalRevenue
+	FROM Employees e
+	INNER JOIN Employee_Types et ON e.Employee_TypeID = et.Employee_TypeID
+	INNER JOIN Appointment_Workers aw ON e.Employee_ID = aw.Employee_ID
+
+	INNER JOIN Appointments a ON aw.Appointment_WorkerID = a.Appointment_WorkerID
+	INNER JOIN Patient_Treatments pt ON a.PatientTreatment_ID = pt.PatientTreatment_ID
+	INNER JOIN Payment p ON pt.PatientTreatment_ID = p.PatientTreatment_ID
+	GROUP BY et.TypeName;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --Views
 	GO
@@ -105,7 +129,30 @@ GO
 		SELECT Patient_ID, Status, COUNT(*) AS Status_Count
 		FROM Appointments
 		GROUP BY Patient_ID, Status;
-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+	GO
+		-- appointment details with revenue:
+		CREATE VIEW AppointmentRevenueDetails AS
+		SELECT A.Appointment_ID, A.Appointment_Date, A.Appointment_time,
+       P.Patient_FirstName, P.Patient_LastName, P.City,
+       T.Treatment, Py.Payment_Method, Py.Total AS Revenue
+		FROM Appointments A
+		INNER JOIN Patients P ON A.Patient_ID = P.Patient_ID
+		INNER JOIN Patient_Treatments PT ON A.PatientTreatment_ID = PT.PatientTreatment_ID
+		INNER JOIN Treatments T ON PT.Treatment_ID = T.Treatment_ID
+		INNER JOIN Payment Py ON PT.PatientTreatment_ID = Py.PatientTreatment_ID;
+	Go
+	--Appointment Statistics by Employee
+		CREATE VIEW AppointmentStatisticsByEmployee AS
+		SELECT CONCAT(E.Employee_FirstName, ' ', E.Employee_LastName) AS EmployeeName,
+        COUNT(A.Appointment_ID) AS TotalAppointments,
+        SUM(P.Total) AS TotalRevenue
+		FROM Employees E
+		INNER JOIN Appointment_Workers AW ON E.Employee_ID = AW.Employee_ID
+		INNER JOIN Appointments A ON AW.Appointment_WorkerID = A.Appointment_WorkerID
+		INNER JOIN Patient_Treatments PT ON A.PatientTreatment_ID = PT.PatientTreatment_ID
+		INNER JOIN Payment P ON PT.PatientTreatment_ID = P.PatientTreatment_ID
+		GROUP BY E.Employee_ID, E.Employee_FirstName, E.Employee_LastName;
+--------------------------------------------------------------------------------------------------------------------
 --Stored procedures
 	GO
 	-- Parameterized query to find a patient by their ID, also prevents SQL injection:
@@ -189,7 +236,7 @@ GO
 			END;
 		END;
 
-
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --LOGINS & OTHER OBJECTS
 -- logins
 CREATE LOGIN SampleLogin WITH PASSWORD = 'DentistStrongPassword';
@@ -213,6 +260,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Room_Bookings TO AdministratorRole;
 GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Employee_Types TO AdministratorRole;
 GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Employees TO AdministratorRole;
 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --other objects (indexes,views, and constraints)
 --index
 CREATE INDEX IX_Appointment_Date ON Appointments (Appointment_Date);
