@@ -235,6 +235,27 @@ GO
 				ROLLBACK TRANSACTION;
 			END;
 		END;
+/* Redone trigger
+	-- Trigger to enforce unique emails for patients
+		CREATE TRIGGER EnforceUniqueEmail
+		ON Patients
+		FOR INSERT, DELETE, UPDATE
+		AS
+		BEGIN
+			DECLARE @CurrentEmail VARCHAR(255), @NewEmail VARCHAR(255)
+    
+			SELECT @CurrentEmail = EMAIL FROM deleted
+			SELECT @NewEmail = EMAIL FROM inserted
+
+			IF @CurrentEmail = @NewEmail
+			BEGIN
+				PRINT 'Email must be unique'
+				ROLLBACK TRANSACTION
+			END
+		END
+
+--ENABLE TRIGGER EnforceUniqueEmail ON Patients;
+*/
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --LOGINS & OTHER OBJECTS
