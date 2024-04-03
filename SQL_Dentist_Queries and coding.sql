@@ -82,7 +82,8 @@ GO
 --Views
 	GO
 	--View for patient appointments and treatments with employee details:
-		CREATE VIEW PatientAppointmentDetails AS
+		CREATE VIEW PatientAppointmentDetails 
+		AS
 		SELECT a.Appointment_ID, a.Appointment_Date, a.Appointment_time,
 		       p.Patient_FirstName, p.Patient_LastName, p.City,
 		       t.Treatment, py.Payment_Method
@@ -91,6 +92,8 @@ GO
 		INNER JOIN Patient_Treatments pt ON a.PatientTreatment_ID = pt.PatientTreatment_ID
 		INNER JOIN Treatments t ON pt.Treatment_ID = t.Treatment_ID
 		INNER JOIN Payment py ON pt.PatientTreatment_ID = py.PatientTreatment_ID;
+
+		-- SELECT * FROM PatientAppointmentDetails 
 	GO
 	-- View to look at employee performance like how many patients, revenue and avg duration per patient:
 		CREATE VIEW EmployeePerformance 
@@ -102,56 +105,76 @@ GO
 		LEFT JOIN Employees E ON AW.Employee_ID = E.Employee_ID
 		LEFT JOIN Room_Bookings RB ON A.RoomBooking_ID = RB.RoomBooking_ID
 		GROUP BY CONCAT(E.Employee_FirstName,' ' ,E.Employee_LastName);
+
+		-- SELECT * FROM EmployeePerformance
 	GO
 	--View for appointments with patient details:
-		CREATE VIEW AppointmentDetails AS
+		CREATE VIEW AppointmentDetails 
+		AS
 		SELECT A.*, P.Patient_FirstName, P.Patient_LastName, P.City
 		FROM Appointments A
 		INNER JOIN Patients P ON A.Patient_ID = P.Patient_ID;
+
+		-- SELECT * FROM AppointmentDetails
 	GO
 	--View for room utilization:
-		CREATE VIEW RoomUtilization AS
+		CREATE VIEW RoomUtilization 
+		AS
 		SELECT R.Room_ID, R.RoomName, COUNT(RB.RoomBooking_ID) AS Bookings
 		FROM Rooms R
 		LEFT JOIN Room_Bookings RB ON R.Room_ID = RB.Room_ID
 		GROUP BY R.Room_ID, R.RoomName;
-	GO
+
+		-- SELECT * FROM RoomUtilization
+	GO 
 	--View for patient treatments and payments:
-		CREATE VIEW PatientPayments AS
+		CREATE VIEW PatientPayments 
+		AS
 		SELECT P.Patient_ID, P.Patient_FirstName, P.Patient_LastName, T.Treatment, Py.Payment_Method, Py.Total
 		FROM Patients P
 		INNER JOIN Patient_Treatments PT ON P.Patient_ID = PT.Patient_ID
 		INNER JOIN Treatments T ON PT.Treatment_ID = T.Treatment_ID
 		INNER JOIN Payment Py ON PT.PatientTreatment_ID = Py.PatientTreatment_ID;
+
+		-- SELECT * FROM PatientPayments
 	GO
 	--View for appointment statuses:
-		CREATE VIEW AppointmentStatus AS
+		CREATE VIEW AppointmentStatus 
+		AS
 		SELECT Patient_ID, Status, COUNT(*) AS Status_Count
 		FROM Appointments
 		GROUP BY Patient_ID, Status;
+
+		-- SELECT * FROM AppointmentStatus
 	GO
 		-- appointment details with revenue:
-		CREATE VIEW AppointmentRevenueDetails AS
+		CREATE VIEW AppointmentRevenueDetails 
+		AS
 		SELECT A.Appointment_ID, A.Appointment_Date, A.Appointment_time,
-       P.Patient_FirstName, P.Patient_LastName, P.City,
-       T.Treatment, Py.Payment_Method, Py.Total AS Revenue
+       		P.Patient_FirstName, P.Patient_LastName, P.City,
+       		T.Treatment, Py.Payment_Method, Py.Total AS Revenue
 		FROM Appointments A
 		INNER JOIN Patients P ON A.Patient_ID = P.Patient_ID
 		INNER JOIN Patient_Treatments PT ON A.PatientTreatment_ID = PT.PatientTreatment_ID
 		INNER JOIN Treatments T ON PT.Treatment_ID = T.Treatment_ID
 		INNER JOIN Payment Py ON PT.PatientTreatment_ID = Py.PatientTreatment_ID;
+
+		-- SELECT * FROM AppointmentRevenueDetails
 	Go
 	--Appointment Statistics by Employee
-		CREATE VIEW AppointmentStatisticsByEmployee AS
+		CREATE VIEW AppointmentStatisticsByEmployee 
+		AS
 		SELECT CONCAT(E.Employee_FirstName, ' ', E.Employee_LastName) AS EmployeeName,
-        COUNT(A.Appointment_ID) AS TotalAppointments,
-        SUM(P.Total) AS TotalRevenue
+        	COUNT(A.Appointment_ID) AS TotalAppointments,
+        	SUM(P.Total) AS TotalRevenue
 		FROM Employees E
 		INNER JOIN Appointment_Workers AW ON E.Employee_ID = AW.Employee_ID
 		INNER JOIN Appointments A ON AW.Appointment_WorkerID = A.Appointment_WorkerID
 		INNER JOIN Patient_Treatments PT ON A.PatientTreatment_ID = PT.PatientTreatment_ID
 		INNER JOIN Payment P ON PT.PatientTreatment_ID = P.PatientTreatment_ID
 		GROUP BY E.Employee_ID, E.Employee_FirstName, E.Employee_LastName;
+
+		-- SELECT * FROM AppointmentStatisticsByEmployee
 --------------------------------------------------------------------------------------------------------------------
 --Stored procedures
 	GO
@@ -260,11 +283,11 @@ GO
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --LOGINS & OTHER OBJECTS
 	-- Logins
-	CREATE LOGIN SampleLogin WITH PASSWORD = 'DentistStrongPassword';
-	CREATE USER SampleUser FOR LOGIN SampleLogin;
-	CREATE ROLE DataEntryRole;
-	CREATE ROLE DoctorRole;
-	CREATE ROLE AdministratorRole;
+		CREATE LOGIN SampleLogin WITH PASSWORD = 'DentistStrongPassword';
+		CREATE USER SampleUser FOR LOGIN SampleLogin;
+		CREATE ROLE DataEntryRole;
+		CREATE ROLE DoctorRole;
+		CREATE ROLE AdministratorRole;
 
 	--Assigning the permissions to the roles
 		GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.Appointments TO DataEntryRole;
@@ -289,7 +312,8 @@ GO
 
 	--Views
 		GO
-		CREATE VIEW AppointmentDetails AS
+		CREATE VIEW AppointmentDetails 
+		AS
 		SELECT A.Appointment_ID, A.Appointment_Date, A.Appointment_time,
 		       P.Patient_FirstName, P.Patient_LastName, P.City,
 		       T.Treatment, Py.Payment_Method
@@ -300,7 +324,8 @@ GO
 		INNER JOIN Payment Py ON PT.PatientTreatment_ID = Py.PatientTreatment_ID;
 
 	/*If the object exists, rename and drop:
-		CREATE VIEW NewAppointmentDetails AS
+		CREATE VIEW NewAppointmentDetails 
+		AS
 		SELECT A.Appointment_ID, A.Appointment_Date, A.Appointment_time,
 		       P.Patient_FirstName, P.Patient_LastName, P.City,
 		       T.Treatment, Py.Payment_Method
@@ -315,14 +340,16 @@ GO
 	and then continue to run the code
 	*/
 	GO
-		CREATE VIEW RoomUtilization AS
+		CREATE VIEW RoomUtilization 
+		AS
 		SELECT R.Room_ID, R.RoomName, COUNT(RB.RoomBooking_ID) AS Bookings
 		FROM Rooms R
 		LEFT JOIN Room_Bookings RB ON R.Room_ID = RB.Room_ID
 		GROUP BY R.Room_ID, R.RoomName;
 
 	/*if the object exists, rename and drop:
-		CREATE VIEW NewRoomUtilization AS
+		CREATE VIEW NewRoomUtilization 
+		AS
 		SELECT R.Room_ID, R.RoomName, COUNT(RB.RoomBooking_ID) AS Bookings
 		FROM Rooms R
 		LEFT JOIN Room_Bookings RB ON R.Room_ID = RB.Room_ID
