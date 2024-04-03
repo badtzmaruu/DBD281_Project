@@ -11,13 +11,7 @@ GO
 		INNER JOIN Patient_Treatments pt ON a.PatientTreatment_ID = pt.PatientTreatment_ID
 		INNER JOIN Payment p ON pt.PatientTreatment_ID = p.PatientTreatment_ID
 		GROUP BY et.TypeName;
-	--Find the total number of appointments scheduled for each room on a specific date:
-		SELECT r.RoomName, COUNT(*) AS TotalAppointments
-		FROM Room_Bookings rb
-		INNER JOIN Rooms r ON rb.Room_ID = r.Room_ID
-		INNER JOIN Appointments a ON rb.RoomBooking_ID = a.RoomBooking_ID
-		WHERE a.Appointment_Date = '2024-03-27'
-		GROUP BY r.RoomName;
+
 	-- To show all possible information about all appointments OR use WHERE to find all details about a specific patient:
 		SELECT 
 		    A.Appointment_ID, A.Appointment_Date, A.Appointment_time, P.Patient_ID,
@@ -32,6 +26,15 @@ GO
 		INNER JOIN Patient_Treatments PT ON A.PatientTreatment_ID = PT.PatientTreatment_ID
 		INNER JOIN Treatments T ON PT.Treatment_ID = T.Treatment_ID;
 		--WHERE P.Patient_ID = 5;
+
+	--Find the total number of appointments scheduled for each room on a specific date:
+		SELECT r.RoomName, COUNT(*) AS TotalAppointments
+		FROM Room_Bookings rb
+		INNER JOIN Rooms r ON rb.Room_ID = r.Room_ID
+		INNER JOIN Appointments a ON rb.RoomBooking_ID = a.RoomBooking_ID
+		WHERE a.Appointment_Date = '2024-03-27'
+		GROUP BY r.RoomName;
+
 	--Find the total revenue generated from treatments on a specific date:
 		SELECT SUM(P.Total) AS Total_Revenue
 		FROM Payment P
