@@ -12,11 +12,10 @@ GO
 		INNER JOIN Payment p ON pt.PatientTreatment_ID = p.PatientTreatment_ID
 		GROUP BY et.TypeName;
 
-	-- To show all possible information about all appointments OR use WHERE to find all details about a specific patient:
-		SELECT 
-		    A.Appointment_ID, A.Appointment_Date, A.Appointment_time, P.Patient_ID,
-		    P.Patient_FirstName, P.Patient_LastName, E.Employee_ID, E.Employee_FirstName, 
-		    E.Employee_LastName, R.Room_ID, R.RoomName, T.Treatment_ID, T.Treatment, T.Price
+	-- To show all possible information about all appointments OR use WHERE to find all details about a specific patient: 
+		SELECT A.Appointment_ID, A.Appointment_Date, A.Appointment_time, P.Patient_ID,
+		       P.Patient_FirstName, P.Patient_LastName, E.Employee_ID, E.Employee_FirstName, 
+		       E.Employee_LastName, R.Room_ID, R.RoomName, T.Treatment_ID, T.Treatment, T.Price
 		FROM Appointments A
 		INNER JOIN Patients P ON A.Patient_ID = P.Patient_ID
 		INNER JOIN Appointment_Workers AW ON A.Appointment_WorkerID = AW.Appointment_WorkerID
@@ -59,28 +58,27 @@ GO
 		WHERE IsAvailable = 'Yes';
 
 	--Total Revenue by treratement type:
-	SELECT T.Treatment, SUM(P.Total) AS TotalRevenue
-	FROM Treatments T
-	INNER JOIN Patient_Treatments PT ON T.Treatment_ID = PT.Treatment_ID
-	INNER JOIN Payment P ON PT.PatientTreatment_ID = P.PatientTreatment_ID
-	GROUP BY T.Treatment;
+		SELECT T.Treatment, SUM(P.Total) AS TotalRevenue
+		FROM Treatments T
+		INNER JOIN Patient_Treatments PT ON T.Treatment_ID = PT.Treatment_ID
+		INNER JOIN Payment P ON PT.PatientTreatment_ID = P.PatientTreatment_ID
+		GROUP BY T.Treatment;
 
 	-- Patients with overdue appointments
-	SELECT P.Patient_ID, P.Patient_FirstName, P.Patient_LastName
-	FROM Patients P
-	INNER JOIN Appointments A ON P.Patient_ID = A.Patient_ID
-	WHERE A.Appointment_Date < GETDATE();
+		SELECT P.Patient_ID, P.Patient_FirstName, P.Patient_LastName
+		FROM Patients P
+		INNER JOIN Appointments A ON P.Patient_ID = A.Patient_ID
+		WHERE A.Appointment_Date < GETDATE();
 
-	-- total revenue by employee type
-	SELECT et.TypeName, SUM(p.Total) AS TotalRevenue
-	FROM Employees e
-	INNER JOIN Employee_Types et ON e.Employee_TypeID = et.Employee_TypeID
-	INNER JOIN Appointment_Workers aw ON e.Employee_ID = aw.Employee_ID
-
-	INNER JOIN Appointments a ON aw.Appointment_WorkerID = a.Appointment_WorkerID
-	INNER JOIN Patient_Treatments pt ON a.PatientTreatment_ID = pt.PatientTreatment_ID
-	INNER JOIN Payment p ON pt.PatientTreatment_ID = p.PatientTreatment_ID
-	GROUP BY et.TypeName;
+	-- Total revenue by employee type
+		SELECT et.TypeName, SUM(p.Total) AS TotalRevenue
+		FROM Employees e
+		INNER JOIN Employee_Types et ON e.Employee_TypeID = et.Employee_TypeID
+		INNER JOIN Appointment_Workers aw ON e.Employee_ID = aw.Employee_ID
+		INNER JOIN Appointments a ON aw.Appointment_WorkerID = a.Appointment_WorkerID
+		INNER JOIN Patient_Treatments pt ON a.PatientTreatment_ID = pt.PatientTreatment_ID
+		INNER JOIN Payment p ON pt.PatientTreatment_ID = p.PatientTreatment_ID
+		GROUP BY et.TypeName;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --Views
 	GO
